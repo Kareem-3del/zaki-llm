@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-text;
+    /* The display face is never letter-spaced; default tracking is part of the voice. */
+    letter-spacing: 0;
+  }
+
+  /* Display headlines: weight 700, neutral tracking, tight leading. */
+  h1, h2, h3, h4 {
+    @apply font-display;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  ::selection {
+    background: #000;
+    color: #fff;
+  }
+
+  /* Thin, brand-correct focus ring — ink only, no chromatic accent. */
+  :focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Centered max-width container with responsive gutters (design.md layout). */
+  .container-zaki {
+    @apply mx-auto w-full max-w-container px-lg md:px-3xl;
+  }
+
+  /* The signature pill — every interactive element rounds to 999px. */
+  .pill-primary {
+    @apply inline-flex items-center justify-center gap-sm rounded-pill bg-primary px-2xl py-md
+      text-body-md-strong text-on-primary transition-colors;
+  }
+  .pill-primary:hover { background-color: #282828; }
+  .pill-primary:active { background-color: #282828; }
+
+  .pill-secondary {
+    @apply inline-flex items-center justify-center gap-sm rounded-pill border border-surface-pressed bg-canvas
+      px-2xl py-md text-body-md-strong text-ink transition-colors;
+  }
+  .pill-secondary:hover { background-color: #efefef; }
+
+  .pill-subtle {
+    @apply inline-flex items-center justify-center gap-sm rounded-pill bg-canvas-soft px-lg py-md
+      text-body-md-strong text-ink transition-colors;
+  }
+  .pill-subtle:hover { background-color: #e2e2e2; }
+
+  /* Secondary pill living on a dark band — inverts to white. */
+  .pill-on-dark {
+    @apply inline-flex items-center justify-center gap-sm rounded-pill bg-canvas px-2xl py-md
+      text-body-md-strong text-ink transition-transform;
+  }
+  .pill-on-dark:hover { transform: translateY(-1px); }
+
+  /* Category chip — pill, soft gray, small strong label, icon precedes label. */
+  .chip {
+    @apply inline-flex items-center gap-sm rounded-pill bg-canvas-soft px-lg py-sm text-body-sm-strong
+      text-ink transition-colors;
+  }
+  .chip:hover { background-color: #e2e2e2; }
+
+  /* Canonical 16px card. */
+  .card {
+    @apply rounded-xl bg-canvas p-2xl;
+  }
+}
+
+/* Hide scrollbars on the horizontal chip rail while keeping it scrollable. */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
