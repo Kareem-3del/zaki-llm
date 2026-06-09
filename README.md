@@ -139,14 +139,24 @@ Generate a password hash: `printf '%s' 'yourpass' | shasum -a 256`.
 
 ## Deployment
 
-Self-host behind any Node host with Ollama reachable:
+**Live:** https://llm.kareem-3del.com
+
+Two ways to run it:
 
 ```bash
-npm run build && npm run start    # serves on :3000
+# A) Local / bare Node
+npm run build && npm run start          # :3000
+
+# B) Docker (standalone image)
+docker build -t zaki . && docker run -p 3000:3000 --env-file .env.local zaki
 ```
 
-CI/CD: `.github/workflows/deploy.yml` builds on push to `main` and deploys over SSH.
-The target host must have Node 20+, the app, and a reachable Ollama with the models pulled.
+**Production (pull-based CD, firewall-friendly):**
+`.github/workflows/deploy.yml` runs on push to `main` → typecheck + build → publishes a Docker
+image to **GHCR** (`ghcr.io/kareem-3del/zaki-llm`). The server runs the image as a container
+routed by **Traefik** (TLS via Let's Encrypt), and **Watchtower** auto-pulls each new image — so
+no inbound SSH to the server is required. The LLM runtime (Ollama + models) is provided via
+`OLLAMA_BASE_URL`; for real inference point it at a host with enough RAM/GPU.
 
 ## Roadmap
 
