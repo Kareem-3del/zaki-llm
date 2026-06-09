@@ -51,11 +51,18 @@ jobs:
             cd "$APP_DIR"
             git fetch --all
             git reset --hard origin/main
-            npm ci
-            npm run build
-            # restart under pm2 (install if missing)
-            command -v pm2 >/dev/null 2>&1 || npm i -g pm2
-            pm2 describe zaki >/dev/null 2>&1 \
-              && pm2 restart zaki --update-env \
-              || pm2 start "npm run start" --name zaki
-            pm2 save
+            [ -f .env.local ] || printf 'OLLAMA_BASE_URL=http://127.0.0.1:11434\nZAKI_AUTH_SECRET=%s\n' "$(openssl rand -hex 32)" > .env.local
+            # Build image and (re)run as a Traefik-routed container on the shared network.
+            docker build -t zaki:latest .
+            docker rm -f zaki 2>/dev/null || true
+            docker run -d --name zaki --restart unless-stopped \
+              --network traefik-public \
+              --env-file "$APP_DIR/.env.local" \
+              -l traefik.enable=true \
+              -l 'traefik.http.routers.zaki.rule=Host(`llm.kareem-3del.com`)' \
+              -l traefik.http.routers.zaki.entrypoints=websecure \
+              -l traefik.http.routers.zaki.tls=true \
+              -l traefik.http.routers.zaki.tls.certresolver=letsencrypt \
+              -l traefik.http.services.zaki.loadbalancer.server.port=3000 \
+              zaki:latest
+            docker image prune -f >/dev/null 2>&1 || true
